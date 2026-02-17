@@ -2,7 +2,7 @@ name: Update JHU calendar (NY time)
 
 on:
   schedule:
-    - cron: "0 * * * *"   # every hour
+    - cron: "0 0 * * *"   # every hour
   workflow_dispatch: {}
 
 permissions:
