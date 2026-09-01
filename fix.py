@@ -11,7 +11,7 @@ OUT = Path("docs/calendar.ics")
 NY = ZoneInfo("America/New_York")
 UTC = ZoneInfo("UTC")
 
-UTC_LINE = re.compile(r"^(DTSTART|DTEND)(?:;[^:]*)?:([0-9]{8}T[0-9]{6})Z\s*$", re.MULTILINE)
+UTC_LINE = re.compile(r"^(DTSTART|DTEND)(?:;[^:]*)?:([0-9]{8}T[0-9]{6})Z$", re.MULTILINE)
 
 VTIMEZONE = """BEGIN:VTIMEZONE
 TZID:America/New_York
@@ -45,6 +45,10 @@ def fetch(url: str) -> str:
         return r.read().decode("utf-8")
 
 def convert(text: str) -> str:
+    # Work with one newline style while editing, then emit the CRLF line
+    # endings required by RFC 5545.
+    text = text.replace("\r\n", "\n").replace("\r", "\n")
+
     def repl(m: re.Match[str]) -> str:
         key = m.group(1)
         dt_utc = datetime.strptime(m.group(2), "%Y%m%dT%H%M%S").replace(tzinfo=UTC)
@@ -63,7 +67,7 @@ def convert(text: str) -> str:
         else:
             out += "\n" + VTIMEZONE + "\n"
 
-    return out
+    return out.rstrip("\n").replace("\n", "\r\n") + "\r\n"
 
 def main():
     OUT.parent.mkdir(parents=True, exist_ok=True)
