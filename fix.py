@@ -34,7 +34,14 @@ END:VTIMEZONE
 """
 
 def fetch(url: str) -> str:
-    with urllib.request.urlopen(url) as r:
+    req = urllib.request.Request(
+        url,
+        headers={
+            "User-Agent": "Mozilla/5.0 (compatible; jhu-ics-nyc-calendar-bot/1.0)",
+            "Accept": "text/calendar,*/*;q=0.8",
+        },
+    )
+    with urllib.request.urlopen(req) as r:
         return r.read().decode("utf-8")
 
 def convert(text: str) -> str:
